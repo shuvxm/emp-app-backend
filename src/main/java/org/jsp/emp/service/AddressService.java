@@ -9,6 +9,7 @@ import org.jsp.emp.entity.Address;
 import org.jsp.emp.entity.Education;
 import org.jsp.emp.entity.Employee;
 import org.jsp.emp.exceptionclasses.InvalidEmployeeIdException;
+import org.jsp.emp.exceptionclasses.NoAddressesfoundException;
 import org.jsp.emp.exceptionclasses.NoEducationFoundException;
 import org.jsp.emp.responsestructure.ResponseStructure;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,17 @@ public class AddressService {
 	private EmployeeDao employeeDao;
 	
 	// add address
-	public ResponseEntity<?> saveAddress(Address address){
+	public ResponseEntity<?> saveAddress(int eid ,Address address){
 		
 		// Fetch the full Employee object from the database using the ID
-	    Employee employee = employeeDao.findEmpById(address.getEmployee().getId()).orElse(null);
+	    Optional<Employee> employee = employeeDao.findEmpById(eid);
+	    if(employee.isEmpty())
+	     throw InvalidEmployeeIdException.builder().message("Invalid Employee Id Unable to map to address...").build();
 	    
 	    // Set the fetched employee in the education entity
-	    address.setEmployee(employee);
+	    Employee e = employee.get();
+	    
+	    address.setEmployee(e);
 	    
 		Address saveaddress= addressDao.saveAddress(address);
 		
@@ -94,6 +99,13 @@ public class AddressService {
 				.build();
 
 		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+
+	public ResponseEntity<?> findAllAddressesByEmployeeId(int eid) {
+		List<Address> addresses =  addressDao.findAllAddressesByEmployeeId(eid);
+		if(addresses.isEmpty())
+			throw NoAddressesfoundException.builder().message("No Address Found for the Given Employee Id : "+eid).build();
+		return ResponseEntity.status(HttpStatus.OK).body( ResponseStructure.builder().status(HttpStatus.OK.value()).message("All Addresses Of Employee Found Successfully...").body(addresses).build() );
 	}
 
 }
