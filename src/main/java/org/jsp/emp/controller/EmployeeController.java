@@ -69,4 +69,9 @@ public class EmployeeController {
 
 	}
 
+//	@GetMapping("/{age}")
+//	public ResponseEntity<?> findEmpByAge(@PathVariable int age){
+//		return service.findEmpByAge(age);
+//	}
+
 }

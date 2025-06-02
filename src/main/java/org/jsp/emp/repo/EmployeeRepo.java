@@ -12,10 +12,11 @@ public interface EmployeeRepo extends JpaRepository<Employee, Long>{
 	Optional<Employee> findByEmailAndPassword(String email, String password);
 
 	List<Employee> findByName(String name);
-     
+
 //	@Query("select e from Employee e where e.status='ACTIVE'")
 	@Query("select e from Employee e")
 	List<Employee> findAllActiveEmp();
+
 
 	
 	
